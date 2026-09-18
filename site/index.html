@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A-Lan Racing League — Resultat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#E10600; --ink:#15151E; --ink-2:#38383F; --muted:#67676C;
+  --line:#E7E7EA; --bg:#F7F4F1; --card:#FFFFFF; --hover:#F2F2F4; --ok:#1a7f37;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#FFFFFF; --ink-2:#D6D6DB; --muted:#9A9AA2;
+    --line:#2A2A32; --bg:#0E0E12; --card:#17171D; --hover:#1F1F27; --ok:#4ac26b;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#FFFFFF; --ink-2:#D6D6DB; --muted:#9A9AA2;
+  --line:#2A2A32; --bg:#0E0E12; --card:#17171D; --hover:#1F1F27; --ok:#4ac26b;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:"Titillium Web","Segoe UI",Arial,sans-serif;
+  font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit}
+
+.topbar{background:var(--ink);color:#fff;position:sticky;top:0;z-index:20}
+.topbar-inner{max-width:1180px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:24px;min-height:58px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:19px;letter-spacing:-.02em}
+.brand .mark{width:6px;height:24px;background:var(--red);transform:skewX(-12deg)}
+.nav{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
+.nav button{background:none;border:0;color:#B9B9C1;font-size:14px;font-weight:600;
+  padding:8px 12px;cursor:pointer;border-bottom:3px solid transparent}
+.nav button:hover{color:#fff}
+.nav button[aria-current="true"]{color:#fff;border-bottom-color:var(--red)}
+.nav button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+
+.wrap{max-width:1180px;margin:0 auto;padding:26px 20px 70px}
+.page-head{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+h1{font-size:34px;font-weight:700;margin:0;letter-spacing:-.01em}
+.season{border:1px solid var(--line);background:var(--card);border-radius:4px;padding:7px 12px;font-size:14px;font-weight:600}
+.cols{display:grid;grid-template-columns:230px 1fr;gap:26px;align-items:start}
+@media(max-width:820px){.cols{grid-template-columns:1fr}}
+
+.side{background:var(--card);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.side h2{font-size:13px;font-weight:700;margin:0;padding:12px 14px;border-bottom:1px solid var(--line);color:var(--muted)}
+.side .item{display:block;padding:10px 14px;border-bottom:1px solid var(--line);font-size:14px;cursor:pointer}
+.side .item:last-child{border-bottom:0}
+.side .item:hover{background:var(--hover)}
+.side .item[aria-current="true"]{background:var(--red);color:#fff}
+.side .rnd{font-size:11px;font-weight:700;opacity:.65;display:block}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.panel-head{padding:18px 20px;border-bottom:1px solid var(--line)}
+.panel-head h2{margin:0;font-size:22px;font-weight:700}
+.panel-head p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.tabs{display:flex;gap:2px;padding:0 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tabs button{background:none;border:0;padding:12px 14px;font-size:14px;font-weight:600;
+  color:var(--muted);cursor:pointer;border-bottom:3px solid transparent}
+.tabs button:hover{color:var(--ink)}
+.tabs button[aria-current="true"]{color:var(--ink);border-bottom-color:var(--red)}
+
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+thead th{text-align:left;font-size:12px;font-weight:700;color:var(--muted);
+  padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+tbody td{padding:13px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--hover)}
+td.pos{font-weight:700;width:52px}
+td.pts{font-weight:700;text-align:right}
+th.num,td.num{text-align:right}
+.driver{font-weight:700}
+.driver .sub{display:block;font-weight:400;font-size:12.5px;color:var(--muted)}
+.tag{font-size:12px;color:var(--muted)}
+.win{color:var(--red);font-weight:700}
+.p1 td.pos,.p2 td.pos,.p3 td.pos{color:var(--red)}
+.empty{padding:40px 20px;text-align:center;color:var(--muted)}
+.note{font-size:13px;color:var(--muted);margin-top:14px;max-width:72ch}
+
+textarea{width:100%;min-height:200px;font-family:ui-monospace,Menlo,Consolas,monospace;
+  font-size:12.5px;padding:12px;border:1px solid var(--line);border-radius:5px;
+  background:var(--bg);color:var(--ink);resize:vertical}
+.btn{background:var(--red);color:#fff;border:0;border-radius:4px;padding:10px 18px;
+  font-size:14px;font-weight:700;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px;margin-top:10px}
+.form-grid label{font-size:12px;color:var(--muted);display:block}
+.form-grid input{width:100%;padding:7px 8px;border:1px solid var(--line);border-radius:4px;
+  background:var(--bg);color:var(--ink);font-size:14px;font-weight:600}
+.body-pad{padding:20px}
+.msg{margin-top:12px;font-size:14px;font-weight:600;min-height:20px}
+.msg.ok{color:var(--ok)} .msg.err{color:var(--red)}
+h3{font-size:16px;margin:26px 0 6px} h3:first-child{margin-top:0}
+ul{padding-left:20px;color:var(--ink-2)} li{margin:5px 0}
+.drop{border:2px dashed var(--line);border-radius:6px;padding:26px;text-align:center;
+  color:var(--muted);cursor:pointer;margin-top:12px}
+.drop.over{border-color:var(--red);color:var(--ink)}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="mark"></span> A-LAN RACING LEAGUE</div>
+    <nav class="nav" id="nav">
+      <button data-view="races">Tävlingar</button>
+      <button data-view="drivers">Förarmästerskap</button>
+      <button data-view="teams">Märkesmästerskap</button>
+      <button data-view="import">Importera</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<script>
+const SEED = [{"id": "r2026-09-17-1", "round": 1, "name": "Knutstorp", "track": "Knutstorp Ring, GP", "date": "2026-09-17", "source": "https://simresults.net/260917-V98", "sessions": {"qualify": [[1, "Alex T", "BMW 320i E36 Super Touring", 5, "00:59.7360", "-"], [2, "Fredrik H", "BMW 320i E36 Super Touring", 7, "00:59.8600", "00:00.1240"], [3, "Ivan G", "Alfa Romeo 156 Super Touring", 6, "01:00.1970", "00:00.4610"], [4, "Emil W", "Opel Vectra Super Touring", 5, "01:00.2320", "00:00.4960"], [5, "Robin S", "Renault Laguna Super Touring", 4, "01:00.2660", "00:00.5300"], [6, "Timmy N", "Opel Vectra Super Touring", 4, "01:00.4540", "00:00.7180"], [7, "Robin S", "Opel Vectra Super Touring", 3, "01:00.4620", "00:00.7260"], [8, "Dennis B", "Renault Laguna Super Touring", 5, "01:00.8040", "00:01.0680"], [9, "Christian B", "Alfa Romeo 156 Super Touring", 5, "01:01.0690", "00:01.3330"], [10, "Anders P", "Audi A4 Super Touring 1995", 6, "01:02.4840", "00:02.7480"], [11, "Robin M", "Audi A4 Super Touring 1995", 6, "01:02.6500", "00:02.9140"], [12, "Stefan L", "Volvo 850 Super Touring", 1, "01:02.9220", "00:03.1860"]], "race1": [[1, "Alex T", "BMW 320i E36 Super Touring", 10, "10:14.4490", "01:00.2050", 10], [2, "Emil W", "Opel Vectra Super Touring", 10, "+00:01.6180", "01:00.4060", 0], [3, "Ivan G", "Alfa Romeo 156 Super Touring", 10, "+00:02.2540", "01:00.4250", 0], [4, "Timmy N", "Opel Vectra Super Touring", 10, "+00:11.1950", "01:00.7880", 0], [5, "Robin S", "Opel Vectra Super Touring", 10, "+00:13.8530", "01:00.9430", 0], [6, "Dennis B", "Renault Laguna Super Touring", 10, "+00:14.3220", "01:00.9870", 0], [7, "Christian B", "Alfa Romeo 156 Super Touring", 10, "+00:15.2040", "01:01.1240", 0], [8, "Fredrik H", "BMW 320i E36 Super Touring", 10, "+00:15.8110", "01:00.3320", 0], [9, "Robin S", "Renault Laguna Super Touring", 10, "+00:19.3970", "01:00.8400", 0], [10, "Anders P", "Audi A4 Super Touring 1995", 10, "+00:22.5730", "01:02.1540", 0], [11, "Stefan L", "Volvo 850 Super Touring", 10, "+00:50.2320", "01:03.7250", 0], [12, "Robin M", "Audi A4 Super Touring 1995", 8, "+2 varv", "01:03.4820", 0]], "race2": [[1, "Fredrik H", "BMW 320i E36 Super Touring", 20, "20:32.3160", "01:00.4280", 20], [2, "Robin S", "Opel Vectra Super Touring", 20, "+00:14.8030", "01:00.9470", 0], [3, "Ivan G", "Alfa Romeo 156 Super Touring", 20, "+00:15.1410", "01:00.6000", 0], [4, "Alex T", "BMW 320i E36 Super Touring", 20, "+00:15.4470", "01:00.6610", 0], [5, "Dennis B", "Renault Laguna Super Touring", 20, "+00:19.4960", "01:01.0410", 0], [6, "Timmy N", "Opel Vectra Super Touring", 20, "+00:31.2090", "01:01.3270", 0], [7, "Christian B", "Alfa Romeo 156 Super Touring", 20, "+00:35.3320", "01:01.5360", 0], [8, "Emil W", "Opel Vectra Super Touring", 20, "+00:39.3820", "01:00.6800", 0], [9, "Anders P", "Audi A4 Super Touring 1995", 19, "+1 varv", "01:02.3360", 0], [10, "Robin M", "Audi A4 Super Touring 1995", 19, "+1 varv", "01:04.0250", 0], [11, "Robin S", "Renault Laguna Super Touring", 15, "DNF", "01:00.4800", 0], [12, "Stefan L", "Volvo 850 Super Touring", 7, "DNF", "01:03.7650", 0]]}, "incidents": {"race1": [{"lap": 8, "driver": "Emil W", "other": "Ivan G", "type": "Car to car collision", "points": 4}, {"lap": 8, "driver": "Ivan G", "other": "Emil W", "type": "Car to car collision", "points": 4}, {"lap": 2, "driver": "Timmy N", "other": "Robin S", "type": "Car to car collision", "points": 4}, {"lap": 7, "driver": "Timmy N", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 2, "driver": "Robin S", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 2, "driver": "Robin S", "other": "Timmy N", "type": "Car to car collision", "points": 4}, {"lap": 3, "driver": "Robin S", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 3, "driver": "Robin S", "other": "Robin S", "type": "Car to car collision", "points": 4}, {"lap": 6, "driver": "Robin S", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 10, "driver": "Robin S", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 1, "driver": "Dennis B", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 1, "driver": "Fredrik H", "other": "", "type": "Losing control of the vehicle", "points": 2}, {"lap": 1, "driver": "Fredrik H", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 4, "driver": "Fredrik H", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 3, "driver": "Robin S", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 3, "driver": "Robin S", "other": "Robin S", "type": "Car to car collision", "points": 4}, {"lap": 7, "driver": "Robin S", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 10, "driver": "Robin S", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 3, "driver": "Anders P", "other": "Robin S", "type": "Car to car collision", "points": 4}, {"lap": 3, "driver": "Anders P", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 4, "driver": "Stefan L", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 4, "driver": "Stefan L", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 4, "driver": "Stefan L", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 6, "driver": "Stefan L", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 6, "driver": "Stefan L", "other": "", "type": "Collision with a track object", "points": 1}, {"lap": 8, "driver": "Stefan L", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 8, "driver": "Stefan L", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 9, "driver": "Stefan L", "other": "Robin M", "type": "Car to car collision", "points": 4}, {"lap": 10, "driver": "Stefan L", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 10, "driver": "Stefan L", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 10, "driver": "Stefan L", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 10, "driver": "Stefan L", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 6, "driver": "Robin M", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 6, "driver": "Robin M", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 6, "driver": "Robin M", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 6, "driver": "Robin M", "other": "", "type": "Collision with a track object", "points": 2}, {"lap": 8, "driver": "Robin M", "other": "Stefan L", "type": "Car to car collision", "points": 4}, {"lap": 8, "driver": "Robin M", "other": "", "type": "Staying stationary on the track", "points": 1}], "race2": [{"lap": 1, "driver": "Robin S", "other": "Dennis B", "type": "Car to car collision", "points": 4}, {"lap": 1, "driver": "Robin S", "other": "Timmy N", "type": "Car to car collision", "points": 4}, {"lap": 16, "driver": "Robin S", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 17, "driver": "Robin S", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 17, "driver": "Robin S", "other": "Robin M", "type": "Car to car collision", "points": 4}, {"lap": 1, "driver": "Ivan G", "other": "Alex T", "type": "Car to car collision", "points": 4}, {"lap": 5, "driver": "Ivan G", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 10, "driver": "Ivan G", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 17, "driver": "Ivan G", "other": "Alex T", "type": "Car to car collision", "points": 4}, {"lap": 1, "driver": "Alex T", "other": "Ivan G", "type": "Car to car collision", "points": 4}, {"lap": 1, "driver": "Alex T", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 5, "driver": "Alex T", "other": "Anders P", "type": "Car to car collision", "points": 4}, {"lap": 13, "driver": "Alex T", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 17, "driver": "Alex T", "other": "Ivan G", "type": "Car to car collision", "points": 4}, {"lap": 1, "driver": "Dennis B", "other": "Robin S", "type": "Car to car collision", "points": 4}, {"lap": 6, "driver": "Dennis B", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 1, "driver": "Timmy N", "other": "Christian B", "type": "Car to car collision", "points": 4}, {"lap": 4, "driver": "Timmy N", "other": "Anders P", "type": "Car to car collision", "points": 4}, {"lap": 5, "driver": "Timmy N", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 12, "driver": "Timmy N", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 1, "driver": "Christian B", "other": "Timmy N", "type": "Car to car collision", "points": 4}, {"lap": 2, "driver": "Christian B", "other": "Robin M", "type": "Car to car collision", "points": 4}, {"lap": 2, "driver": "Christian B", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 5, "driver": "Christian B", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 5, "driver": "Christian B", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 8, "driver": "Christian B", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 11, "driver": "Christian B", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 12, "driver": "Christian B", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 19, "driver": "Christian B", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 1, "driver": "Emil W", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 2, "driver": "Emil W", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 6, "driver": "Emil W", "other": "Robin M", "type": "Car to car collision", "points": 4}, {"lap": 8, "driver": "Emil W", "other": "Anders P", "type": "Car to car collision", "points": 4}, {"lap": 1, "driver": "Anders P", "other": "Robin M", "type": "Car to car collision", "points": 4}, {"lap": 1, "driver": "Anders P", "other": "Robin M", "type": "Car to car collision", "points": 4}, {"lap": 4, "driver": "Anders P", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 4, "driver": "Anders P", "other": "Timmy N", "type": "Car to car collision", "points": 4}, {"lap": 5, "driver": "Anders P", "other": "Alex T", "type": "Car to car collision", "points": 4}, {"lap": 5, "driver": "Anders P", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 7, "driver": "Anders P", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 7, "driver": "Anders P", "other": "", "type": "Losing control of the vehicle", "points": 2}, {"lap": 7, "driver": "Anders P", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 8, "driver": "Anders P", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 8, "driver": "Anders P", "other": "Emil W", "type": "Car to car collision", "points": 4}, {"lap": 18, "driver": "Anders P", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 1, "driver": "Robin M", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 1, "driver": "Robin M", "other": "Anders P", "type": "Car to car collision", "points": 4}, {"lap": 1, "driver": "Robin M", "other": "Robin S", "type": "Car to car collision", "points": 4}, {"lap": 2, "driver": "Robin M", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 2, "driver": "Robin M", "other": "", "type": "Collision with a track object", "points": 2}, {"lap": 6, "driver": "Robin M", "other": "Emil W", "type": "Car to car collision", "points": 4}, {"lap": 8, "driver": "Robin M", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 9, "driver": "Robin M", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 15, "driver": "Robin M", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 16, "driver": "Robin M", "other": "Robin S", "type": "Car to car collision", "points": 4}, {"lap": 17, "driver": "Robin M", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 1, "driver": "Robin S", "other": "Robin M", "type": "Car to car collision", "points": 4}, {"lap": 2, "driver": "Robin S", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 3, "driver": "Stefan L", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 3, "driver": "Stefan L", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 3, "driver": "Stefan L", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 4, "driver": "Stefan L", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 5, "driver": "Stefan L", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 5, "driver": "Stefan L", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 5, "driver": "Stefan L", "other": "", "type": "Invalid Lap", "points": 1}, {"lap": 6, "driver": "Stefan L", "other": "", "type": "Invalid Lap", "points": 1}]}}];
+
+/* ---------- Lagring ---------- */
+const KEY_ROUNDS="alan.rounds.v2", KEY_PTS="alan.points.v2";
+const DEFAULT_PTS={table:[25,18,15,12,10,8,6,4,2,1],pole:1,fastest:1};
+function load(k,f){try{const r=localStorage.getItem(k);return r?JSON.parse(r):f}catch(e){return f}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
+let rounds=load(KEY_ROUNDS,null)||JSON.parse(JSON.stringify(SEED));
+let SEASON=2026, LEAGUE="A-Lan Racing League";
+let points=Object.assign({},DEFAULT_PTS,load(KEY_PTS,{})||{});
+rounds.sort((a,b)=>a.round-b.round);
+
+/* ---------- Hjälp ---------- */
+const BRANDS=["Alfa Romeo","BMW","Audi","Opel","Renault","Volvo","Honda","Ford","Peugeot","Nissan","Toyota","Seat","Vauxhall","Mercedes"];
+function brandOf(v){if(!v)return"—";const h=BRANDS.find(b=>v.toLowerCase().startsWith(b.toLowerCase()));return h||v.split(" ")[0]}
+function buildKeyMap(){
+  const m={};
+  rounds.forEach(r=>Object.values(r.sessions||{}).forEach(rows=>(rows||[]).forEach(([,n,v])=>{
+    (m[n]=m[n]||new Set()).add(brandOf(v));})));
+  const amb=new Set(Object.keys(m).filter(n=>m[n].size>1));
+  return (n,v)=>amb.has(n)?n+" · "+brandOf(v):n;
+}
+let keyOf=buildKeyMap();
+function ptsForPos(p){return points.table[p-1]||0}
+function timeToMs(t){const m=String(t||"").match(/^(?:(\d+):)?(\d+)\.(\d+)$/);
+  return m?(parseInt(m[1]||0)*60+parseInt(m[2]))*1000+parseInt(m[3].padEnd(3,"0").slice(0,3)):Infinity}
+function fastestOf(rows){let b=null,bm=Infinity;(rows||[]).forEach(r=>{const ms=timeToMs(r[5]);if(ms<bm){bm=ms;b=r}});return b}
+function finished(t){return !/^\s*(DNF|DNS|DSQ)/i.test(String(t||""))}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function fmtDate(d){try{return new Date(d+"T12:00:00").toLocaleDateString("sv-SE",{day:"numeric",month:"long",year:"numeric"})}catch(e){return d}}
+
+/* ---------- Mästerskap ---------- */
+function standings(){
+  const drv={},team={};
+  const ensure=(s,k,x)=>s[k]=s[k]||Object.assign({key:k,pts:0,wins:0,podiums:0,inc:0},x);
+  rounds.forEach(r=>{
+    const s=r.sessions||{};
+    if(points.pole&&s.qualify&&s.qualify[0]){
+      const[,n,v]=s.qualify[0];
+      ensure(drv,keyOf(n,v),{name:n,vehicle:v}).pts+=points.pole;
+      ensure(team,brandOf(v),{name:brandOf(v)}).pts+=points.pole;
+    }
+    ["race1","race2"].forEach(rk=>{
+      const rows=s[rk]; if(!rows||!rows.length)return;
+      const fl=points.fastest?fastestOf(rows):null;
+      rows.forEach(row=>{
+        const[pos,n,v,,tf]=row, k=keyOf(n,v), b=brandOf(v);
+        let p=finished(tf)?ptsForPos(pos):0;
+        if(fl===row&&points.fastest&&finished(tf))p+=points.fastest;
+        const d=ensure(drv,k,{name:n,vehicle:v}); d.pts+=p;
+        if(pos===1)d.wins++; if(pos<=3)d.podiums++;
+        const t=ensure(team,b,{name:b}); t.pts+=p; if(pos===1)t.wins++;
+      });
+      ((r.incidents||{})[rk]||[]).forEach(it=>{
+        const row=rows.find(x=>x[1]===it.driver);
+        if(!row)return;
+        ensure(drv,keyOf(it.driver,row[2]),{name:it.driver,vehicle:row[2]}).inc+=it.points;
+      });
+    });
+  });
+  const sort=o=>Object.values(o).sort((a,b)=>b.pts-a.pts||b.wins-a.wins||a.name.localeCompare(b.name,"sv"));
+  return {drivers:sort(drv),teams:sort(team)};
+}
+
+/* ---------- Vyer ---------- */
+let view="races", openRound=rounds.length?rounds[0].id:null, openTab="race1";
+const app=document.getElementById("app"), nav=document.getElementById("nav");
+nav.addEventListener("click",e=>{const b=e.target.closest("button[data-view]");if(b){view=b.dataset.view;render()}});
+
+function head(t){return `<div class="page-head"><h1>${t}</h1>
+  <span class="season">Säsong ${SEASON} · ${rounds.length} deltävling${rounds.length===1?"":"ar"}</span></div>`}
+
+function render(){
+  [...nav.querySelectorAll("button")].forEach(b=>b.setAttribute("aria-current",String(b.dataset.view===view)));
+  ({races:renderRaces,drivers:renderDrivers,teams:renderTeams,import:renderImport})[view]();
+  window.scrollTo({top:0});
+}
+
+function renderRaces(){
+  if(!rounds.length){
+    app.innerHTML=head("Tävlingar")+`<div class="panel"><div class="empty">
+      Inga deltävlingar ännu. Lägg till den första under <strong>Importera</strong>.</div></div>`;return;
+  }
+  const r=rounds.find(x=>x.id===openRound)||rounds[0]; openRound=r.id;
+  const s=r.sessions||{}, inc=r.incidents||{};
+  const avail=[];
+  if((s.qualify||[]).length)avail.push(["qualify","Kval"]);
+  if((s.race1||[]).length)avail.push(["race1","Race 1"]);
+  if((s.race2||[]).length)avail.push(["race2","Race 2"]);
+  const hasInc=Object.values(inc).some(a=>a&&a.length);
+  if(hasInc)avail.push(["incidents","Incidenter"]);
+  if(!avail.some(a=>a[0]===openTab))openTab=avail[0][0];
+
+  let body;
+  if(openTab==="incidents")body=incTable(r);
+  else if(openTab==="qualify")body=qualTable(s.qualify);
+  else body=raceTable(s[openTab]);
+
+  app.innerHTML=head("Tävlingar")+`
+  <div class="cols">
+    <aside class="side"><h2>Säsong ${SEASON}</h2>
+      ${rounds.map(x=>`<div class="item" data-round="${esc(x.id)}" aria-current="${x.id===r.id}" role="button" tabindex="0">
+        <span class="rnd">Deltävling ${x.round}</span>${esc(x.name)}</div>`).join("")}
+    </aside>
+    <section class="panel">
+      <div class="panel-head"><h2>${esc(r.name)}</h2>
+        <p>${esc(r.track||"")} · ${fmtDate(r.date)}${r.source?` · <a href="${esc(r.source)}" target="_blank" rel="noopener" style="color:var(--red);font-weight:600">Simresults</a>`:""}</p></div>
+      <div class="tabs" id="tabs">${avail.map(([k,l])=>`<button data-tab="${k}" aria-current="${k===openTab}">${l}</button>`).join("")}</div>
+      <div class="tablewrap">${body}</div>
+    </section></div>`;
+
+  app.querySelectorAll("[data-round]").forEach(el=>{
+    const go=()=>{openRound=el.dataset.round;render()};
+    el.addEventListener("click",go);
+    el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}});
+  });
+  document.getElementById("tabs").addEventListener("click",e=>{
+    const b=e.target.closest("button[data-tab]"); if(b){openTab=b.dataset.tab;render()}});
+}
+
+function qualTable(rows){
+  return `<table><thead><tr><th>Pos</th><th>Förare</th><th>Bil</th><th class="num">Varv</th><th>Bästa varv</th><th>Diff</th></tr></thead><tbody>
+  ${rows.map(([p,n,v,l,b,g])=>`<tr class="p${p}"><td class="pos">${p}</td>
+    <td class="driver">${esc(n)}<span class="sub">${esc(brandOf(v))}</span></td>
+    <td class="tag">${esc(v)}</td><td class="num">${l}</td><td>${esc(b)}</td><td>${esc(g)}</td></tr>`).join("")}
+  </tbody></table>`;
+}
+
+function raceTable(rows){
+  const fl=fastestOf(rows);
+  return `<table><thead><tr><th>Pos</th><th>Förare</th><th>Bil</th><th class="num">Varv</th>
+    <th>Tid/Diff</th><th>Bästa varv</th><th class="num">Poäng</th></tr></thead><tbody>
+  ${rows.map(row=>{
+    const[p,n,v,l,t,b]=row, ok=finished(t);
+    const isFl=fl===row&&points.fastest&&ok;
+    let pts=(ok?ptsForPos(p):0)+(isFl?points.fastest:0);
+    return `<tr class="p${p}"><td class="pos">${p}</td>
+      <td class="driver">${esc(n)}<span class="sub">${esc(brandOf(v))}</span></td>
+      <td class="tag">${esc(v)}</td><td class="num">${l}</td>
+      <td${ok?"":' class="win"'}>${esc(t)}</td>
+      <td>${esc(b)}${isFl?' <span class="win">SV</span>':""}</td>
+      <td class="pts">${pts||"—"}</td></tr>`}).join("")}
+  </tbody></table>`;
+}
+
+function incTable(r){
+  const inc=r.incidents||{};
+  const all=[];
+  Object.keys(inc).forEach(k=>(inc[k]||[]).forEach(i=>all.push(Object.assign({sess:k},i))));
+  if(!all.length)return `<div class="empty">Inga incidenter registrerade.</div>`;
+  const per={};
+  all.forEach(i=>per[i.driver]=(per[i.driver]||0)+i.points);
+  const list=Object.entries(per).sort((a,b)=>b[1]-a[1]);
+  const label={race1:"Race 1",race2:"Race 2"};
+  return `<table><thead><tr><th>Förare</th><th class="num">Incidentpoäng</th><th class="num">Antal</th></tr></thead><tbody>
+  ${list.map(([n,p])=>`<tr><td class="driver">${esc(n)}</td><td class="pts">${p}</td>
+    <td class="num">${all.filter(i=>i.driver===n).length}</td></tr>`).join("")}
+  </tbody></table>
+  <table style="margin-top:2px"><thead><tr><th>Session</th><th class="num">Varv</th><th>Förare</th><th>Motpart</th><th>Händelse</th><th class="num">Poäng</th></tr></thead><tbody>
+  ${all.map(i=>`<tr><td class="tag">${label[i.sess]||i.sess}</td><td class="num">${i.lap}</td>
+    <td class="driver">${esc(i.driver)}</td><td class="tag">${esc(i.other||"—")}</td>
+    <td>${esc(i.type)}</td><td class="pts">${i.points}</td></tr>`).join("")}
+  </tbody></table>`;
+}
+
+function renderDrivers(){
+  const list=standings().drivers;
+  app.innerHTML=head("Förarmästerskap")+`<section class="panel"><div class="tablewrap">
+  <table><thead><tr><th>Pos</th><th>Förare</th><th>Bil</th><th class="num">Segrar</th>
+    <th class="num">Pallplatser</th><th class="num">Incidentp.</th><th class="num">Poäng</th></tr></thead><tbody>
+  ${list.map((d,i)=>`<tr class="p${i+1}"><td class="pos">${i+1}</td>
+    <td class="driver">${esc(d.key)}</td><td class="tag">${esc(brandOf(d.vehicle))}</td>
+    <td class="num">${d.wins}</td><td class="num">${d.podiums}</td>
+    <td class="num">${d.inc||"—"}</td><td class="pts">${d.pts}</td></tr>`).join("")}
+  </tbody></table></div></section>
+  <p class="note">Poäng: ${points.table.join("–")} för placering 1–${points.table.length} i varje race${points.pole?`, +${points.pole} för pole`:""}${points.fastest?`, +${points.fastest} för snabbaste varv`:""}. Incidentpoäng kommer från Simresults och påverkar inte ställningen.</p>`;
+}
+
+function renderTeams(){
+  const list=standings().teams;
+  app.innerHTML=head("Märkesmästerskap")+`<section class="panel"><div class="tablewrap">
+  <table><thead><tr><th>Pos</th><th>Märke</th><th class="num">Poäng</th></tr></thead><tbody>
+  ${list.map((t,i)=>`<tr class="p${i+1}"><td class="pos">${i+1}</td>
+    <td class="driver">${esc(t.name)}</td><td class="pts">${t.pts}</td></tr>`).join("")}
+  </tbody></table></div></section>
+  <p class="note">Poängen summeras per bilmärke, oavsett hur många förare som kör märket.</p>`;
+}
+
+/* ---------- CSV-parser (Simresults-export) ---------- */
+function csvCells(line){
+  const out=[];let cur="",q=false;
+  for(const ch of line){
+    if(ch==='"'){q=!q;continue}
+    if(ch===","&&!q){out.push(cur);cur="";continue}
+    cur+=ch;
+  }
+  out.push(cur);
+  return out.map(s=>s.trim().replace(/^'/,"").trim());
+}
+const SEPLINE=/^'[+=]{5,}/;
+
+function parseCSV(text){
+  const lines=text.split(/\r?\n/);
+  const meta={},sessions={},incidents={};
+  const map={"Qualify":"qualify","Race":"race1","Race 1":"race1","Race 2":"race2","Race2":"race2"};
+  let i=0;
+  while(i<lines.length){
+    const line=lines[i].trim();
+    let m=line.match(/^(Date|Track|Game):?,\s*(.*)$/);
+    if(m&&!meta[m[1].toLowerCase()])meta[m[1].toLowerCase()]=m[2].replace(/^"|"$/g,"").trim();
+
+    m=line.match(/^(Practice|Qualify|Race ?\d*) result$/);
+    if(m){
+      const label=m[1].replace(/\s+/g," ").trim();
+      const sess=map[label];
+      i++; while(i<lines.length&&SEPLINE.test(lines[i].trim()))i++;
+      const header=csvCells(lines[i]); i++;
+      const rows=[];
+      while(i<lines.length&&lines[i].trim()){
+        const c=csvCells(lines[i]),o={};
+        header.forEach((h,j)=>o[h]=c[j]!==undefined?c[j]:"");
+        if(/^\d+$/.test(o["Pos"]||""))rows.push(o);
+        i++;
+      }
+      if(sess)sessions[sess]=rows;
+      continue;
+    }
+
+    m=line.match(/^Race ?(\d+) incidents$/);
+    if(m){
+      const sess="race"+m[1];
+      i++; while(i<lines.length&&SEPLINE.test(lines[i].trim()))i++;
+      i++;
+      const items=[];
+      while(i<lines.length&&lines[i].trim()){
+        const c=csvCells(lines[i]);
+        const it=parseIncident(c[1]||"");
+        if(it)items.push(it);
+        i++;
+      }
+      incidents[sess]=items;
+      continue;
+    }
+    i++;
+  }
+  return {meta,sessions,incidents};
+}
+
+function parseIncident(txt){
+  const m=txt.match(/^LAP (\d+),\s*(.*?),\s*Points:\s*(\d+)$/);
+  if(!m)return null;
+  const parts=m[2].split(",").map(s=>s.trim());
+  return {lap:+m[1],driver:parts[0],other:parts.length>2?parts[1]:"",type:parts[parts.length-1],points:+m[3]};
+}
+
+function toRound(parsed,number,name,src){
+  const {meta,sessions,incidents}=parsed;
+  const out={sessions:{},incidents:{}};
+  if(sessions.qualify)out.sessions.qualify=sessions.qualify.map(r=>
+    [+r["Pos"],r["Driver"],r["Vehicle"],+(r["Laps"]||0),r["Best lap"]||"",r["Gap"]||"-"]);
+  ["race1","race2"].forEach(k=>{
+    const rows=sessions[k]; if(!rows)return;
+    const maxLaps=Math.max(...rows.map(r=>+(r["Laps"]||0)));
+    out.sessions[k]=rows.map(r=>{
+      const laps=+(r["Laps"]||0); let t=r["Time/Retired"]||"";
+      const down=maxLaps-laps;
+      if(down>0&&finished(t))t=`+${down} varv`;
+      return [+r["Pos"],r["Driver"],r["Vehicle"],laps,t,r["Best lap"]||"",+(r["Led"]||0)];
+    });
+  });
+  Object.keys(incidents).forEach(k=>{if(incidents[k].length)out.incidents[k]=incidents[k]});
+  const date=(meta.date||"").slice(0,10)||new Date().toISOString().slice(0,10);
+  const track=meta.track||"";
+  return Object.assign({
+    id:"r"+Date.now(), round:number,
+    name:name||track.split(",")[0].trim()||"Ny deltävling",
+    track, date, source:src||""
+  },out);
+}
+
+/* ---------- Import ---------- */
+function renderImport(){
+  app.innerHTML=head("Importera")+`
+  <section class="panel"><div class="body-pad">
+    <h3>Lägg till en deltävling</h3>
+    ${LIVE?`<p class="note" style="margin-top:0;color:var(--red)">Sajten läser <code>data.json</code>, som byggs automatiskt från <code>races.json</code>. Lägg hellre till deltävlingen där — importen här är bara en tillfällig förhandsvisning i din egen webbläsare.</p>`:""}
+    <p class="note" style="margin-top:0">Öppna resultatet på Simresults, klicka <strong>Export CSV</strong> och släpp filen här. Bana och datum läses ur filen.</p>
+    <div class="drop" id="drop">Släpp CSV-filen här, eller klicka för att välja
+      <input type="file" id="file" accept=".csv,text/csv" hidden></div>
+    <details style="margin-top:12px"><summary style="cursor:pointer;font-size:13px;color:var(--muted)">Klistra in innehållet istället</summary>
+      <textarea id="f-data" placeholder="Klistra in hela CSV-filen här…" style="margin-top:10px"></textarea></details>
+    <div class="form-grid" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))">
+      <div><label for="f-name">Namn (valfritt)</label><input id="f-name" placeholder="Läses från filen"></div>
+      <div><label for="f-round">Deltävling nr</label><input id="f-round" type="number" min="1" value="${rounds.length+1}"></div>
+      <div><label for="f-src">Simresults-länk</label><input id="f-src" placeholder="https://simresults.net/..."></div>
+    </div>
+    <div class="row">
+      <button class="btn" id="btn-import">Lägg till deltävling</button>
+      <button class="btn ghost" id="btn-reset">Återställ till ursprungsdata</button>
+    </div>
+    <div class="msg" id="msg"></div>
+
+    <h3>Poängsystem</h3>
+    <div class="form-grid">
+      ${points.table.map((v,i)=>`<div><label for="pt${i}">P${i+1}</label><input id="pt${i}" type="number" value="${v}" min="0"></div>`).join("")}
+      <div><label for="pt-pole">Pole</label><input id="pt-pole" type="number" value="${points.pole}" min="0"></div>
+      <div><label for="pt-fl">Snabb. varv</label><input id="pt-fl" type="number" value="${points.fastest}" min="0"></div>
+    </div>
+    <div class="row"><button class="btn" id="btn-pts">Spara poängsystem</button></div>
+
+    <h3>Deltävlingar i ligan</h3>
+    ${rounds.length?`<ul>${rounds.map(r=>`<li>Deltävling ${r.round} — ${esc(r.name)} (${esc(r.date)})
+      <a data-del="${esc(r.id)}" style="color:var(--red);cursor:pointer;font-weight:600">ta bort</a></li>`).join("")}</ul>`
+      :`<p class="note">Inga ännu.</p>`}
+  </div></section>`;
+
+  const drop=document.getElementById("drop"), file=document.getElementById("file");
+  drop.addEventListener("click",()=>file.click());
+  drop.addEventListener("dragover",e=>{e.preventDefault();drop.classList.add("over")});
+  drop.addEventListener("dragleave",()=>drop.classList.remove("over"));
+  drop.addEventListener("drop",e=>{e.preventDefault();drop.classList.remove("over");
+    if(e.dataTransfer.files[0])readFile(e.dataTransfer.files[0])});
+  file.addEventListener("change",()=>{if(file.files[0])readFile(file.files[0])});
+
+  document.getElementById("btn-import").addEventListener("click",()=>doImport(document.getElementById("f-data").value));
+  document.getElementById("btn-pts").addEventListener("click",savePoints);
+  document.getElementById("btn-reset").addEventListener("click",()=>{
+    rounds=JSON.parse(JSON.stringify(SEED));save(KEY_ROUNDS,rounds);keyOf=buildKeyMap();render()});
+  app.querySelectorAll("[data-del]").forEach(el=>el.addEventListener("click",()=>{
+    rounds=rounds.filter(r=>r.id!==el.dataset.del);save(KEY_ROUNDS,rounds);keyOf=buildKeyMap();render()}));
+}
+
+function readFile(f){
+  const rd=new FileReader();
+  rd.onload=()=>doImport(String(rd.result));
+  rd.onerror=()=>msg("Filen gick inte att läsa.",false);
+  rd.readAsText(f);
+}
+
+function msg(t,ok){const e=document.getElementById("msg");if(e){e.textContent=t;e.className="msg "+(ok?"ok":"err")}}
+
+function doImport(text){
+  if(!text||!text.trim())return msg("Välj en CSV-fil eller klistra in innehållet först.",false);
+  let parsed;
+  try{parsed=parseCSV(text)}catch(e){return msg("Kunde inte tolka filen: "+e.message,false)}
+  const n=Object.values(parsed.sessions).reduce((a,r)=>a+r.length,0);
+  if(!n)return msg("Hittade inga resultatrader. Är det en CSV-export från Simresults?",false);
+
+  const r=toRound(parsed,
+    parseInt(document.getElementById("f-round").value)||rounds.length+1,
+    document.getElementById("f-name").value.trim(),
+    document.getElementById("f-src").value.trim());
+  rounds.push(r); rounds.sort((a,b)=>a.round-b.round);
+  if(!save(KEY_ROUNDS,rounds))return msg("Kunde inte spara i den här webbläsaren.",false);
+  keyOf=buildKeyMap(); openRound=r.id;
+  const sum=Object.keys(r.sessions).map(k=>`${k} (${r.sessions[k].length})`).join(", ");
+  msg(`Tillagd: ${r.name} — ${sum}.`,true);
+  setTimeout(()=>{view="races";render()},900);
+}
+
+function savePoints(){
+  points={
+    table:points.table.map((_,i)=>Math.max(0,parseInt(document.getElementById("pt"+i).value)||0)),
+    pole:Math.max(0,parseInt(document.getElementById("pt-pole").value)||0),
+    fastest:Math.max(0,parseInt(document.getElementById("pt-fl").value)||0)
+  };
+  save(KEY_PTS,points);
+  msg("Poängsystemet är sparat.",true);
+}
+
+async function boot(){
+  try{
+    const res=await fetch("data.json?v="+Date.now(),{cache:"no-store"});
+    if(res.ok){
+      const d=await res.json();
+      if(d&&Array.isArray(d.rounds)&&d.rounds.length){
+        rounds=d.rounds.slice().sort((a,b)=>a.round-b.round);
+        openRound=rounds[0].id;
+        if(d.points&&d.points.table)points=Object.assign({},DEFAULT_PTS,d.points,load(KEY_PTS,{})||{});
+        if(d.season)SEASON=d.season;
+        if(d.league){LEAGUE=d.league;
+          document.querySelector(".brand").innerHTML=
+            '<span class="mark"></span> '+d.league.toUpperCase();
+          document.title=d.league+" — Resultat";}
+        keyOf=buildKeyMap();
+        LIVE=true;
+      }
+    }
+  }catch(e){/* ingen data.json — kör med inbyggd data */}
+  render();
+}
+let LIVE=false;
+boot();
+</script>
+</body>
+</html>

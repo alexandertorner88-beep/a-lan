@@ -1,0 +1,14 @@
+{
+  "league": "A-Lan Racing League",
+  "season": 2026,
+
+  "points": {
+    "table": [25, 18, 15, 12, 10, 8, 6, 4, 2, 1],
+    "pole": 1,
+    "fastest": 1
+  },
+
+  "rounds": [
+    { "id": "260917-V98", "round": 1, "name": "Knutstorp" }
+  ]
+}
