@@ -9,6 +9,8 @@
   },
 
   "rounds": [
-    { "id": "260917-V98", "round": 1, "name": "Knutstorp" }
+    { "id": "260903-n9g", "round": 1, "name": "Falkenberg" }
+    { "id": "260910-3MH", "round": 3, "name": "Gelleråsen" }
+    { "id": "260917-V98", "round": 3, "name": "Knutstorp" }
   ]
 }
