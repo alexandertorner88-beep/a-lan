@@ -165,11 +165,8 @@ function standings(){
       ensure(team,brandOf(v),{name:brandOf(v)}).pts+=points.pole;
     }
     ["race1","race2"].forEach(rk=>{
-      let rows=s[rk]; if(!rows||!rows.length)return;
-
-rows=adjustedRaceRows(rows,r.round,rk);
-
-const fl=points.fastest?fastestOf(rows):null;
+      const rows=s[rk]; if(!rows||!rows.length)return;
+      const fl=points.fastest?fastestOf(rows):null;
       rows.forEach(row=>{
         const[pos,n,v,,tf]=row, k=keyOf(n,v), b=brandOf(v);
         let p=finished(tf)?ptsForPos(pos):0;
@@ -221,7 +218,7 @@ function renderRaces(){
   let body;
   if(openTab==="incidents")body=incTable(r);
   else if(openTab==="qualify")body=qualTable(s.qualify);
-  else body=raceTable(s[openTab],r.round,openTab);
+  else body=raceTable(s[openTab]);
 
   app.innerHTML=head("Tävlingar")+`
   <div class="cols">
@@ -253,38 +250,20 @@ function qualTable(rows){
   </tbody></table>`;
 }
 
-function raceTable(rows,round,raceKey){
-  rows=adjustedRaceRows(rows,round,raceKey);
-
+function raceTable(rows){
   const fl=fastestOf(rows);
-
   return `<table><thead><tr><th>Pos</th><th>Förare</th><th>Bil</th><th class="num">Varv</th>
     <th>Tid/Diff</th><th>Bästa varv</th><th class="num">Poäng</th></tr></thead><tbody>
-  ${rows.map((row,i)=>{
-    const[p,n,v,l,t,b]=row;
-    const ok=finished(t);
-    const displayPos=i+1;
-    const penalty=penaltyFor(round,raceKey,n);
+  ${rows.map(row=>{
+    const[p,n,v,l,t,b]=row, ok=finished(t);
     const isFl=fl===row&&points.fastest&&ok;
-
-    let pts=(ok?ptsForPos(displayPos):0)+(isFl?points.fastest:0);
-
-    const penaltyText=penalty
-      ? ` <span class="win">↓ -${penalty.positions}</span>`
-      : "";
-
-    return `<tr class="p${displayPos}">
-      <td class="pos">${displayPos}</td>
-      <td class="driver">${esc(n)}${penaltyText}
-        <span class="sub">${esc(brandOf(v))}${penalty?` · ${esc(penalty.reason)}`:""}</span>
-      </td>
-      <td class="tag">${esc(v)}</td>
-      <td class="num">${l}</td>
+    let pts=(ok?ptsForPos(p):0)+(isFl?points.fastest:0);
+    return `<tr class="p${p}"><td class="pos">${p}</td>
+      <td class="driver">${esc(n)}<span class="sub">${esc(brandOf(v))}</span></td>
+      <td class="tag">${esc(v)}</td><td class="num">${l}</td>
       <td${ok?"":' class="win"'}>${esc(t)}</td>
       <td>${esc(b)}${isFl?' <span class="win">SV</span>':""}</td>
-      <td class="pts">${pts||"—"}</td>
-    </tr>`;
-  }).join("")}
+      <td class="pts">${pts||"—"}</td></tr>`}).join("")}
   </tbody></table>`;
 }
 
