@@ -515,6 +515,12 @@ function savePoints(){
 
 async function boot(){
   try{
+    const penaltyRes=await fetch("penalties.json?v="+Date.now(),{cache:"no-store"});
+    if(penaltyRes.ok){
+      const p=await penaltyRes.json();
+      if(Array.isArray(p))penalties=p;
+    }
+
     const res=await fetch("data.json?v="+Date.now(),{cache:"no-store"});
     if(res.ok){
       const d=await res.json();
