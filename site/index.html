@@ -53,10 +53,13 @@ h1{font-size:34px;font-weight:700;margin:0;letter-spacing:-.01em}
 .side .item:last-child{border-bottom:0}
 .side .item:hover{background:var(--hover)}
 .side .item[aria-current="true"]{background:var(--red);color:#fff}
-.side .item.upcoming{
-  color:var(--muted);
-  cursor:default;
-  background:transparent;
+.side .item.upcoming .countdown-time{
+  display:block;
+  margin-top:4px;
+  font-size:18px;
+  font-weight:700;
+  color:var(--red);
+  letter-spacing:.02em;
 }
 
 .side .item.upcoming:hover{
@@ -262,22 +265,17 @@ function renderRaces(){
     <span class="rnd">Deltävling ${x.round}</span>${esc(x.name)}
   </div>`).join("")}
 
-  ${UPCOMING.filter(u=>!rounds.some(r=>r.round===u.round)).map(u=>`
-    <div class="item upcoming">
-      <span class="rnd">Kommande · Deltävling ${u.round}</span>
-      ${esc(u.name)}
-    </div>
-  `).join("")}
-
-  ${nextRace()?`
-    <div class="countdown">
-      <div class="countdown-label">NÄSTA LOPP</div>
-      <div class="countdown-name">${esc(nextRace().name)}</div>
-      <div class="countdown-time" id="countdown">
-        ${countdownText(nextRace().date)}
-      </div>
-    </div>
-  `:``}
+${UPCOMING.filter(u=>!rounds.some(r=>r.round===u.round)).map(u=>`
+  <div class="item upcoming">
+    <span class="rnd">Kommande · Deltävling ${u.round}</span>
+    ${esc(u.name)}
+    ${nextRace() && nextRace().round===u.round ? `
+      <span class="countdown-time" id="countdown">
+        ${countdownText(u.date)}
+      </span>
+    ` : ``}
+  </div>
+`).join("")}
 
 </aside>
     <section class="panel">
