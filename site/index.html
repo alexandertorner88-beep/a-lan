@@ -269,6 +269,15 @@ function renderRaces(){
     </div>
   `).join("")}
 
+  ${nextRace()?`
+    <div class="countdown">
+      <div class="countdown-label">NÄSTA LOPP</div>
+      <div class="countdown-name">${esc(nextRace().name)}</div>
+      <div class="countdown-time" id="countdown">
+        ${countdownText(nextRace().date)}
+      </div>
+    </div>
+  `:``}
 
 </aside>
     <section class="panel">
